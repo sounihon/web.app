@@ -1,0 +1,23 @@
+@import "../../vars.scss";
+.SButton {
+  padding: $button-padding;
+  border: none;
+  font-size: 1rem;
+  border-radius: $button-radius;
+  cursor: pointer;
+  box-shadow: $button-shadow;
+
+  &--primary {
+    background-color: map-get($button-default, "bg");
+    color: map-get($button-default, "fg");
+  }
+
+  &--green {
+    background-color: map-get($button-green, "bg");
+    color: map-get($button-green, "fg");
+  }
+}
+
+.SButton:active {
+  box-shadow: $button-shadow-pressed;
+}

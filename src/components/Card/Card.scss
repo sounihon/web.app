@@ -1,0 +1,45 @@
+@import "../../vars.scss";
+
+.SCard {
+  min-width: 100px;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+
+  &Header {
+    order: 0;
+    font-size: 1.2rem;
+    padding-bottom: $card-padding;
+    font-family: $fs-header;
+  }
+
+  &Body {
+    order: 1;
+    font-size: 1rem;
+    border-radius: $card-border-radius;
+    box-shadow: $card-shadow;
+    padding: 1.5rem 1rem;
+    background: $color-white;
+    margin-bottom: auto;
+  }
+
+  &Actions {
+    order: 2;
+    display: flex;
+    align-items: center;
+    margin-top: 1.5rem;
+    justify-content: flex-end;
+    margin-bottom: -0.5rem;
+  }
+
+  &SubActions {
+    order: 3;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 0.5rem;
+    * {
+      font-size: 0.8rem;
+    }
+  }
+}

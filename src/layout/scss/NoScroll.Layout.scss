@@ -1,0 +1,10 @@
+.NoScrollLayout {
+  width: 100%;
+  height: 100vh;
+
+  &--centered {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+}

@@ -1,0 +1,79 @@
+@import "../../vars.scss";
+
+.STextline {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 4rem;
+
+  &Input {
+    display: flex;
+    align-items: center;
+
+    input {
+      width: calc(100% - 2rem - 2px);
+      padding: 0;
+      margin: 0;
+      box-shadow: none;
+      border: 1px solid $input-border-color;
+      border-radius: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      outline: none;
+      background-color: $color-white;
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+  }
+
+  &--error {
+    .STextlineInput {
+      input {
+        animation: TextlineErrorAnim 0.2s ease;
+        border-color: $color-red;
+        color: $color-red;
+      }
+    }
+  }
+
+  &Error {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    color: $color-red;
+    font-size: 0.8rem;
+  }
+
+  &Icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    cursor: pointer;
+    color: $color-black;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: $color-gray;
+    }
+
+    &--append {
+      margin-left: 0.5rem;
+    }
+  }
+}
+
+@keyframes TextlineErrorAnim {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-0.2rem);
+  }
+  50% {
+    transform: translateX(0);
+  }
+  75% {
+    transform: translateX(0.2rem);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}

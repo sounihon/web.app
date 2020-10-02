@@ -1,0 +1,10 @@
+.SList {
+  display: flex;
+  flex-direction: column;
+
+  &Item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+}
