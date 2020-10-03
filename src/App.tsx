@@ -2,6 +2,8 @@ import React from "react";
 import { routes } from "./router";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import "./App.scss";
+import { observer } from "mobx-react-lite";
+import { authStore } from "./modules/login/store";
 
 function App() {
   return (
@@ -22,4 +24,4 @@ function App() {
   );
 }
 
-export default App;
+export default observer(App);

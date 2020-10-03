@@ -1,4 +1,5 @@
 import React, { ChangeEvent, FC, useState, useEffect, useRef } from "react";
+
 import { NoScrollLayoyt } from "../../layout/NoScroll.Layout";
 import {
   SCard,
@@ -9,10 +10,11 @@ import {
 } from "../../components/Card";
 import { SList, SListItem } from "../../components/List";
 import { SButton } from "../../components/Button";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import { SLink } from "../../components/Link";
 import { STextline } from "../../components/Textline";
 import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { observer } from "mobx-react-lite";
 import { authStore } from "./store";
 
 enum ACTIONS {
@@ -24,12 +26,23 @@ interface RouteParams {
   action?: ACTIONS;
 }
 
-export const Login: FC = () => {
+export const Login: FC = observer(() => {
   let { action } = useParams<RouteParams>();
+  const history = useHistory();
+
+  if(authStore.userJWT) {
+    history.goBack();
+  }
+
   if (!action) action = ACTIONS.LOGIN;
 
   const getActionAsText = () => {
     return `${action![0].toUpperCase()}${action!.substr(1)}`;
+  };
+  const getOppositeActionAsText = () => {
+    const opposite =
+      action === ACTIONS.LOGIN ? ACTIONS.REGISTER : ACTIONS.LOGIN;
+    return `${opposite![0].toUpperCase()}${opposite!.substr(1)}`;
   };
   const getOppositeActionRoute = () => {
     const opposite =
@@ -58,6 +71,7 @@ export const Login: FC = () => {
       setLoginError("");
     }
   }, [login]);
+
   useEffect(() => {
     if (!initedPassword.current) {
       initedPassword.current = true;
@@ -87,20 +101,27 @@ export const Login: FC = () => {
     setPassword(event.target.value);
   };
 
-  const tryAction = () => {
-    authStore.registerUser();
-    if (action === ACTIONS.REGISTER) {
-      return;
+  const tryAction = async () => {
+    switch (action) {
+      case ACTIONS.LOGIN:
+        await authStore.loginUserByLP(login, password);
+        history.replace("/");
+        break;
+      case ACTIONS.REGISTER:
+        try {
+          await authStore.registerUser(login, password);
+          history.replace("/auth/login");
+        } catch (e) {
+          // @todo gloval error handler to the snackbar 
+        }
+        break;
     }
-    // send some action to backend
   };
 
   return (
     <NoScrollLayoyt centeredContent>
       <SCard width={350}>
-        <SCardHeader>
-          Please {authStore.user.username} {action}
-        </SCardHeader>
+        <SCardHeader>Please {action}</SCardHeader>
         <SCardBody>
           <SList>
             <SListItem>
@@ -128,10 +149,10 @@ export const Login: FC = () => {
         </SCardBody>
         <SCardSubActions>
           <SLink to={getOppositeActionRoute()}>
-            {getActionAsText() + " instead"}
+            {getOppositeActionAsText() + " instead"}
           </SLink>
         </SCardSubActions>
       </SCard>
     </NoScrollLayoyt>
   );
-};
+});
