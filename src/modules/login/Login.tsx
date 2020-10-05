@@ -1,158 +1,60 @@
-import React, { ChangeEvent, FC, useState, useEffect, useRef } from "react";
-
-import { NoScrollLayoyt } from "../../layout/NoScroll.Layout";
-import {
-  SCard,
-  SCardBody,
-  SCardHeader,
-  SCardActions,
-  SCardSubActions,
-} from "../../components/Card";
-import { SList, SListItem } from "../../components/List";
-import { SButton } from "../../components/Button";
-import { useParams, useHistory } from "react-router-dom";
-import { SLink } from "../../components/Link";
-import { STextline } from "../../components/Textline";
-import { AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
+import { ArrowRight16 } from "@carbon/icons-react";
+import { Button, TextInput } from "carbon-components-react";
 import { observer } from "mobx-react-lite";
-import { authStore } from "./store";
+import React, { FC, useState } from "react";
+import { NoScrollLayoyt } from "../../layout/NoScroll.Layout";
+import { validateNotEmptyString } from "../../utils/validations";
+import "./Login.scss";
 
-enum ACTIONS {
-  LOGIN = "login",
-  REGISTER = "register",
-}
-
-interface RouteParams {
-  action?: ACTIONS;
+export enum ELoginState {
+  START,
+  LOGIN,
+  REGISTER,
 }
 
 export const Login: FC = observer(() => {
-  let { action } = useParams<RouteParams>();
-  const history = useHistory();
+  const [username, setUsername] = useState("");
+  const [stage, setStage] = useState(ELoginState.START);
 
-  if(authStore.userJWT) {
-    history.goBack();
-  }
-
-  if (!action) action = ACTIONS.LOGIN;
-
-  const getActionAsText = () => {
-    return `${action![0].toUpperCase()}${action!.substr(1)}`;
-  };
-  const getOppositeActionAsText = () => {
-    const opposite =
-      action === ACTIONS.LOGIN ? ACTIONS.REGISTER : ACTIONS.LOGIN;
-    return `${opposite![0].toUpperCase()}${opposite!.substr(1)}`;
-  };
-  const getOppositeActionRoute = () => {
-    const opposite =
-      action === ACTIONS.LOGIN ? ACTIONS.REGISTER : ACTIONS.LOGIN;
-    return `/auth/${opposite}`;
-  };
-
-  let [login, setLogin] = useState("");
-  let [password, setPassword] = useState("");
-  let [loginError, setLoginError] = useState("");
-  let [passwordError, setPasswordError] = useState("");
-  let [passwordType, setPasswordType] = useState("password");
-  let [passwordIcon, setPasswordIcon] = useState(() => AiFillEye);
-
-  let inited = useRef(false);
-  let initedPassword = useRef(false);
-
-  useEffect(() => {
-    if (!inited.current) {
-      inited.current = true;
-      return;
+  const onButtonClick = () => {
+    if (!validateNotEmptyString(username)) {
+      // show some error
     }
-    if (!login || login.length === 0) {
-      setLoginError("Please provide a login");
-    } else {
-      setLoginError("");
-    }
-  }, [login]);
 
-  useEffect(() => {
-    if (!initedPassword.current) {
-      initedPassword.current = true;
-      return;
-    }
-    if (!password || password.length === 0) {
-      setPasswordError("Please provide a password");
-    } else {
-      setPasswordError("");
-    }
-  }, [password]);
-
-  const togglePasswordType = () => {
-    if (passwordType === "password") {
-      setPasswordType("text");
-      setPasswordIcon(() => AiFillEyeInvisible);
-    } else {
-      setPasswordType("password");
-      setPasswordIcon(() => AiFillEye);
-    }
-  };
-
-  const validateLogin = (event: ChangeEvent<HTMLInputElement>) => {
-    setLogin(event.target.value);
-  };
-  const validatePassword = (event: ChangeEvent<HTMLInputElement>) => {
-    setPassword(event.target.value);
-  };
-
-  const tryAction = async () => {
-    switch (action) {
-      case ACTIONS.LOGIN:
-        await authStore.loginUserByLP(login, password);
-        history.replace("/");
+    switch (stage) {
+      case ELoginState.START:
+        // check if login exists
+        setStage(ELoginState.REGISTER);
         break;
-      case ACTIONS.REGISTER:
-        try {
-          await authStore.registerUser(login, password);
-          history.replace("/auth/login");
-        } catch (e) {
-          // @todo gloval error handler to the snackbar 
-        }
+      case ELoginState.LOGIN:
+        break;
+      case ELoginState.REGISTER:
         break;
     }
   };
 
   return (
-    <NoScrollLayoyt centeredContent>
-      <SCard width={350}>
-        <SCardHeader>Please {action}</SCardHeader>
-        <SCardBody>
-          <SList>
-            <SListItem>
-              <STextline
-                placeholder="Login"
-                onInput={validateLogin}
-                error={loginError}
-                type="text"
-              />
-            </SListItem>
-            <SListItem>
-              <STextline
-                placeholder="Password"
-                type={passwordType}
-                onChange={validatePassword}
-                error={passwordError}
-                appendIcon={passwordIcon}
-                clickAppend={togglePasswordType}
-              ></STextline>
-            </SListItem>
-          </SList>
-          <SCardActions>
-            <SButton onClick={tryAction}>{getActionAsText()}</SButton>
-          </SCardActions>
-        </SCardBody>
-        <SCardSubActions>
-          <SLink to={getOppositeActionRoute()}>
-            {getOppositeActionAsText() + " instead"}
-          </SLink>
-        </SCardSubActions>
-      </SCard>
+    <NoScrollLayoyt centeredContent={true}>
+      <div className="Login">
+        <div className="Login-Header">
+          Log in
+          {stage !== ELoginState.START ? (
+            <div className="Login-Header__sub">
+              Loggin in as <span>{username} </span>.
+            </div>
+          ) : undefined}
+        </div>
+
+        <TextInput
+          id="login"
+          labelText="Username"
+          onChange={(evt) => setUsername(evt.target.value)}
+        ></TextInput>
+
+        <Button onClick={onButtonClick} renderIcon={ArrowRight16}>
+          Continue
+        </Button>
+      </div>
     </NoScrollLayoyt>
   );
 });
